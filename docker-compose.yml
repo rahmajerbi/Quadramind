@@ -1,17 +1,32 @@
 version: '3.6'
 
-networks:
-  elk:
-    driver: bridge
 
 services:
+  influxdb:
+    container_name: influxdb
+    image: influxdb:2.4.0-alpine
+    restart: always
+    volumes:
+      - influxdb-data:/var/lib/influxdb2
+    ports:
+      - 8086:8086
+    environment:
+      - INFLUXDB_DB=${INFLUXDB_DB}
+     # - INFLUXDB_USER_BUCKET=${BUCKET}
+      - INFLUXDB_ADMIN_USER=${ADMIN_USERNAME}
+      - INFLUXDB_ADMIN_USER_PASSWORD=${ADMIN_PASSWORD}
+      - INFLUXDB_ADMIN_USER_TOKEN=${AUTH_TOKEN}
+
+    networks:
+      - mimic-network
+
   zookeeper:
     image: 'bitnami/zookeeper:latest'
     ports:
       - "2181:2181"
     environment:
       ALLOW_ANONYMOUS_LOGIN: 1
-    
+ 
   kafka:
     image: 'bitnami/kafka:2.8.1'
     ports:
@@ -29,6 +44,77 @@ services:
     environment:
       ZK_HOSTS: "zookeeper:2181"
       APPLICATION_SECRET: "random-secret"
+   
+  telegraf:
+    container_name: telegraf
+    image: telegraf:latest
+    restart: always
+    volumes:
+      - ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+    depends_on:
+      - influxdb
+    links:
+      - influxdb
+    ports:
+      - 8125:8125
+    networks:
+      - mimic-network
+  
 
-      
+  grafana:
+    container_name: grafana
+    image: grafana/grafana-oss:9.1.8
+    ports:
+      - 3000:3000
+    restart: always
+    volumes:
+      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+      - grafana-data:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GF_SECURITY_ADMIN_USER}
+      - GF_SECURITY_ADMIN_PASSWORD=${GF_SECURITY_ADMIN_PASSWORD}
+    depends_on:
+      - influxdb
+    networks:
+      - mimic-network
+  spark:
+    image: bitnami/spark:latest
+    environment:
+      - SPARK_MODE=master
+      - SPARK_RPC_AUTHENTICATION_ENABLED=no
+      - SPARK_RPC_ENCRYPTION_ENABLED=no
+      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
+      - SPARK_SSL_ENABLED=no
+      - SPARK_USER=spark
+    ports:
+      - '8080:8080'
+    networks:
+      - mimic-network
     
+  spark-worker:
+    image: bitnami/spark:latest
+    environment:
+      - SPARK_MODE=worker
+      - SPARK_MASTER_URL=spark://spark:7077
+      - SPARK_WORKER_MEMORY=1G
+      - SPARK_WORKER_CORES=1
+      - SPARK_RPC_AUTHENTICATION_ENABLED=no
+      - SPARK_RPC_ENCRYPTION_ENABLED=no
+      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
+      - SPARK_SSL_ENABLED=no
+      - SPARK_USER=spark
+    networks:
+      - mimic-network 
+  
+networks:
+ mimic-network:
+  driver: bridge
+
+volumes:
+  grafana-data:
+  chronograf-storage:
+  influxdb-data:
+#volumes:
+  #grafana_data: {}
+  #influxdb_data: {}
+ 
