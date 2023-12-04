@@ -33,6 +33,20 @@ class BloodPressure:
         df = df.distinct()
         return df
     
+    @staticmethod
+    def BloodPressureClassification(df):
+        df = df.withColumn(
+            'BP_level',
+            when((col('SBP') < 120) & (col('DBP') < 80), lit('Normal'))
+            .when((col('SBP') >= 120) & (col('SBP') < 130) & (col('DBP') < 80), lit('Elevated'))
+            .when((col('SBP') >= 130) & (col('SBP') < 140) | ((col('DBP') >= 80) & (col('DBP') < 90)), lit('Stage 1 Hypertension'))
+            .when((col('SBP') >= 140) | (col('DBP') >= 90), lit('Stage 2 Hypertension'))
+            .otherwise(lit('Hypertensive Crisis'))
+        )
+        return df
+    
+
+    
 if __name__ == "__main__":
     
     # create Spark session
@@ -55,10 +69,13 @@ if __name__ == "__main__":
     df = df.withColumn("data", from_json(df.value, BloodPressure.get_schema())).select("data.*")
 
     df.printSchema()
+
     # Remove duplicates
     df = BloodPressure.removeDuplicates(df)
-    assert type(df) == pyspark.sql.dataframe.DataFrame
+    # Blood Pressure Categorization
+    df = BloodPressure.BloodPressureClassification(df)
 
+    assert type(df) == pyspark.sql.dataframe.DataFrame
     row_df = df.select(
         to_json(struct("Datetime")).alias('key'),
         to_json(struct('RR', 'SPO2', 'MAP', 'SBP', 'DBP', 'HR', 'PP', 'CO', 'DateTime')).alias("value") )
@@ -71,9 +88,20 @@ if __name__ == "__main__":
         .option("truncate", "false")\
         .format("console") \
         .start()
-    
-    query.awaitTermination()
 
+    #query.awaitTermination()
+
+    # Writing to Kafka topic processedBPprediction
+    query = row_df\
+        .selectExpr("CAST(key AS STRING)", "CAST(value AS STRING)") \
+        .writeStream\
+        .format("kafka") \
+        .option("kafka.bootstrap.servers", 'localhost:9092') \
+        .option("topic", output_topic) \
+        .option("checkpointLocation", "checkpoints") \
+        .start().awaitTermination()
+    
+    print(query.status)
 
     
 ## OUTPUT
