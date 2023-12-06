@@ -34,6 +34,25 @@ class BloodPressure:
         return df
     
     @staticmethod
+    def drop_constant_columns(df):
+        result = df.copy()
+        for column in df.columns:
+            if len(df[column].unique()) == 1:
+                result = result.drop(column,axis=1)
+        return result
+    
+    @staticmethod
+    def drop_corr_features(df):
+        corr_matrix = df.corr().abs()
+        # Select upper triangle of correlation matrix
+        upper = corr_matrix.where(np.triu(np.ones(corr_matrix.shape), k=1).astype(np.bool))
+        # Find features with correlation greater than 0.95
+        to_drop = [column for column in upper.columns if any(upper[column] > 0.95)]
+        # Drop features 
+        df.drop(to_drop, axis=1, inplace=True)
+        return df
+    
+    @staticmethod
     def BloodPressureClassification(df):
         df = df.withColumn(
             'BP_level',
@@ -74,6 +93,10 @@ if __name__ == "__main__":
     df = BloodPressure.removeDuplicates(df)
     # Blood Pressure Categorization
     df = BloodPressure.BloodPressureClassification(df)
+    # Drop constant attributes
+    df = BloodPressure.drop_constant_columns(df)
+    # Drop higher correlated variables
+    df = BloodPressure.drop_corr_features(df)
 
     assert type(df) == pyspark.sql.dataframe.DataFrame
     row_df = df.select(
