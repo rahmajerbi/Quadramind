@@ -1,6 +1,6 @@
 ## SBP_DBP_Forecasting.ipynb
 
-This Jupyter Notebook (`SBP_DBP_Forecasting.ipynb`) contains the code used for building the offline model. It covers data preprocessing, model training, and evaluation for forecasting SBP and DBP values.
+This Jupyter Notebook (`SBP_DBP_Forecasting.ipynb`) contains the code used for building the LSTM model for time series forecasting. It covers data preprocessing, model training, and evaluation for forecasting SBP and DBP values.
 
 ## prediction_utils.py
 
