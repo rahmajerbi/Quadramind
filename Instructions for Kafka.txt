@@ -1,0 +1,9 @@
+1.	open Terminal/Command prompt as administrator
+2.	cd to the folder where docker-compose.yml is in
+3.	docker-compose –f docker-compose.yml up
+4.	check if all three containers running: docker ps 
+5.	Run producer.jpynb from Kafka folder (The purpose is to generate and send messages to the Kafka topic  'Topic_A')
+6.	Run fictional_ml.jpynb from ML foler (This Python script serves as a consumer for Kafka messages from 'Topic_A' and a producer for results to 'Topic_B')
+7.	Run consumer.jpynb from Kafka folder (The purpose is to consume messages from the Kafka topic  'Topic_B')
+
+
