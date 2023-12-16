@@ -9,7 +9,7 @@ from pyspark.sql.types import *
 os.environ['PYSPARK_SUBMIT_ARGS'] = '--packages org.apache.spark:spark-streaming-kafka-0-10_2.12:3.5.0,org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.0 pyspark-shell'
 
 topic_name = 'Topic_A'
-output_topic = 'processedBPprediction'
+output_topic = 'processed_BPprediction'
 
 
 class BloodPressure:
@@ -93,15 +93,15 @@ if __name__ == "__main__":
     df = BloodPressure.removeDuplicates(df)
     # Blood Pressure Categorization
     df = BloodPressure.BloodPressureClassification(df)
-    # Drop constant attributes
-    df = BloodPressure.drop_constant_columns(df)
-    # Drop higher correlated variables
-    df = BloodPressure.drop_corr_features(df)
+    # # Drop constant attributes
+    # df = BloodPressure.drop_constant_columns(df)
+    # # Drop higher correlated variables
+    # df = BloodPressure.drop_corr_features(df)
 
     assert type(df) == pyspark.sql.dataframe.DataFrame
     row_df = df.select(
         to_json(struct("Datetime")).alias('key'),
-        to_json(struct('RR', 'SPO2', 'MAP', 'SBP', 'DBP', 'HR', 'PP', 'CO', 'DateTime')).alias("value") )
+        to_json(struct('DateTime', 'RR', 'SPO2', 'MAP', 'SBP', 'DBP', 'HR', 'PP', 'CO', 'BP_level')).alias("value") )
     
     # Write final result into console for debugging purpose
     query = row_df \

@@ -4,6 +4,8 @@ from pyspark.ml.stat import Correlation
 from pyspark.ml.feature import VectorAssembler, MinMaxScaler
 from pyspark.sql.window import Window
 import matplotlib.pyplot as plt
+from pyspark.sql.functions import lag, lead, when, lit
+from pyspark.sql.functions import coalesce
 
 # Create a SparkSession
 spark = SparkSession.builder.appName("BPprocessing").getOrCreate()
@@ -22,6 +24,61 @@ df.describe().show()
 # Iterate through the DataFrame schema and print column names along with their data types
 for col_name, data_type in df.dtypes:
     print(f"Column '{col_name}' has data type '{data_type}'")
+
+zero_sbp_dbp_rows = df.filter((df['SBP'] == 0) & (df['DBP'] == 0) & (df['HR'] == 0) & (df['SPO2'] == 0))
+print('ZERO BLOOD PRESSURE: \n')
+zero_sbp_dbp_rows.show()
+
+
+def replace_zero_SBP_DBP(df):
+    # Calculate lag and lead values for SBP and DBP columns
+    df = df.withColumn('SBP_lag', lag('SBP').over(Window.orderBy('DateTime')))
+    df = df.withColumn('SBP_lead', lead('SBP').over(Window.orderBy('DateTime')))
+    df = df.withColumn('DBP_lag', lag('DBP').over(Window.orderBy('DateTime')))
+    df = df.withColumn('DBP_lead', lead('DBP').over(Window.orderBy('DateTime')))
+
+    # Replace NULL in SBP_lag and DBP_lag with zeros
+    df = df.withColumn('SBP_lag', coalesce(df['SBP_lag'], lit(0)))
+    df = df.withColumn('DBP_lag', coalesce(df['DBP_lag'], lit(0)))
+
+    # Replace zero SBP and DBP values with mean of t-1 and t+1 rows if HR and SPO2 are not zero
+    df = df.withColumn('SBP', when((df['SBP'] == 0) & (df['HR'] != 0) & (df['SPO2'] != 0),
+                                   (df['SBP_lag'] + df['SBP_lead']) / 2).otherwise(df['SBP']))
+    df = df.withColumn('DBP', when((df['DBP'] == 0) & (df['HR'] != 0) & (df['SPO2'] != 0),
+                                   (df['DBP_lag'] + df['DBP_lead']) / 2).otherwise(df['DBP']))
+
+    # Drop intermediate columns
+    df = df.drop('SBP_lag', 'SBP_lead', 'DBP_lag', 'DBP_lead')
+
+    return df
+
+
+
+# Apply the function to your DataFrame
+modified_df = replace_zero_SBP_DBP(df)
+modified_df.show()
+
+# Filter rows where SBP and DBP have zero values
+zero_sbp_dbp_rows = modified_df.filter((modified_df['SBP'] == 0) & (modified_df['DBP'] == 0))
+print('ZERO BLOOD PRESSURE: \n')
+zero_sbp_dbp_rows.show()
+
+
+def BloodPressureClassification(df):
+    df = df.withColumn(
+            'BP_level',
+            when((col('SBP') < 120) & (col('DBP') < 80), lit("Normal"))
+            .when((col('SBP') >= 120) & (col('SBP') < 130) & (col('DBP') < 80), lit("Elevated"))
+            .when((col('SBP') >= 130) & (col('SBP') < 140) | ((col('DBP') >= 80) & (col('DBP') < 90)), lit("Stage 1 Hypertension"))
+            .when((col('SBP') >= 140) | (col('DBP') >= 90), lit("Stage 2 Hypertension"))
+            .otherwise(lit("Hypertensive Crisis"))
+        )
+    return df
+
+
+modified_df = BloodPressureClassification(modified_df)
+modified_df.show()
+modified_df.coalesce(1).write.option("header", "true").csv("./Kafka/data/proccesed_mimic_2425.csv")
 
 
 # Get column names except the first one (it's a DateTime column)
@@ -79,7 +136,7 @@ normalized_df.show()
 data = df.withColumn('DateTime', df['DateTime'].cast('timestamp'))
 
 # Define the window partitioned by time
-time_window = Window.orderBy(col('DateTime').cast('long')).rangeBetween(-3600, 0)  # 3600 seconds (1 hour) window
+time_window = Window.orderBy(col('DateTime').cast('long')).rangeBetween(-300, 0)  # 300 seconds (5 min) window
 
 # Calculate rolling averages for columns RR, SPO2, MAP, SBP, DBP, HR, PP, CO over the defined window
 rolling_avg_df = data.withColumn('RR_RollingAvg', avg(col('RR')).over(time_window)) \
@@ -116,7 +173,7 @@ plt.plot(rolling_avg_pandas['DateTime'], rolling_avg_pandas['DBP_RollingAvg'], l
 # Customize plot
 plt.xlabel('DateTime')
 plt.ylabel('Values')
-plt.title('Time Series Data and Rolling Averages (RR)')
+plt.title('Time Series Data and Rolling Averages')
 plt.legend()
 plt.show()
 
