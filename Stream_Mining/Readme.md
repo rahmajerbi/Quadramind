@@ -1,4 +1,4 @@
-## SBP_DBP_Forecasting.ipynb
+## Multi_Step_SBP_DBP_Forecasting.ipynb
 
 This Jupyter Notebook (`Multi_Step_SBP_DBP_Forecasting.ipynb`) contains the code used for building the forecasting model to predict the next 30 minutes of Systolic Blood Pressure (SBP) and Diastolic Blood Pressure (DBP). Using a Long Short-Term Memory (LSTM) neural network, the model leverages the past 10 minutes of blood pressure measurements to make accurate and timely predictions.
 
