@@ -1,10 +1,7 @@
 ## SBP_DBP_Forecasting.ipynb
 
-This Jupyter Notebook (`SBP_DBP_Forecasting.ipynb`) contains the code used for building the LSTM model for time series forecasting. It covers data preprocessing, model training, and evaluation for forecasting SBP and DBP values.
+This Jupyter Notebook (`Multi_Step_SBP_DBP_Forecasting.ipynb`) contains the code used for building the forecasting model to predict the next 30 minutes of Systolic Blood Pressure (SBP) and Diastolic Blood Pressure (DBP) based on historical data. Using a Long Short-Term Memory (LSTM) neural network, the model leverages the past 10 minutes of blood pressure measurements to make accurate and timely predictions.
 
-## prediction_utils.py
-
-The `prediction_utils.py` file contains a modular utility function `predict_future` that predicts future values for SBP and DBP based on a trained model and input data.
 
 ## forecasting_consumer_producer.ipynb
 
