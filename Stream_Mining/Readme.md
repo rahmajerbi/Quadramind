@@ -5,4 +5,4 @@ This Jupyter Notebook (`Multi_Step_SBP_DBP_Forecasting.ipynb`) contains the code
 
 ## forecasting_consumer_producer.ipynb
 
-The `forecasting_consumer_producer.ipynb` notebook covers the real-time aspect of the forecasting. It includes code for consuming input data from a Kafka topic, producing predictions, and pushing the results back to another Kafka topic. Each minute the forecasting is done for the next 10 minutes based on incoming real-time data.
+The `forecasting_consumer_producer.ipynb` notebook covers the real-time aspect of the forecasting. It includes code for consuming input data from a Kafka topic, producing predictions, and pushing the results back to another Kafka topic. Each minute the forecasting is done for the next 30 minutes based on incoming real-time data.
