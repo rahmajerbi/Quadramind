@@ -1,1 +1,5 @@
+## Spark-based Exploratory Data Analysis (EDA)
+`The Spark_EDA.py` python is centered around Exploratory Data Analysis using PySpark. It delves into examining and understanding the characteristics of the dataset leveraging Spark's capabilities. The notebook explores data distribution, statistical summaries, and key insights, providing a comprehensive exploration of the dataset's structure and content through the lens of PySpark.
 
+## Spark K-Means for Anomaly Detection Integrated with Kafka
+The `KMeans.py` python demonstrates the application of K-Means clustering for anomaly detection within a Spark environment, integrated with Kafka. This notebook focuses on clustering-based anomaly detection techniques using PySpark's implementation of K-Means. It outlines the process of consuming streaming data from a Kafka topic, applying K-Means clustering to detect anomalies within the data stream, and subsequently transmitting identified anomalies back to another Kafka topic. The notebook orchestrates real-time anomaly detection by harnessing Spark's K-Means capabilities integrated with Kafka for continuous anomaly identification in the streaming data
