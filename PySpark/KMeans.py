@@ -58,7 +58,7 @@ if __name__ == "__main__":
 ## TRAINING THE MODEL
 
 # Read your data into a DataFrame
-data = spark.read.csv(r"C:\Users\User\Desktop\Quadramind-pyspark (1)\Quadramind-pyspark\Kafka\data\historical_data.csv", header=True, inferSchema=True)
+data = spark.read.csv(r"\Kafka\data\historical_data.csv", header=True, inferSchema=True)
 
 # Threshold values for blood pressure levels
 normal_sbp_upper = 120
