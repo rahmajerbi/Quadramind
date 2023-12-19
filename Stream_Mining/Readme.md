@@ -3,9 +3,9 @@
 This Jupyter Notebook (`Multi_Step_SBP_DBP_Forecasting.ipynb`) contains the code used for building the forecasting model to predict the next 30 minutes of Systolic Blood Pressure (SBP) and Diastolic Blood Pressure (DBP). Using a Long Short-Term Memory (LSTM) neural network, the model leverages the past 10 minutes of blood pressure measurements to make accurate and timely predictions.
 
 
-## forecasting_consumer_producer.ipynb
+## forecasting_consumer.ipynb
 
-The `forecasting_consumer_producer.ipynb` notebook covers the real-time aspect of the forecasting. It includes code for consuming input data from a Kafka topic, producing predictions, and pushing the results back to another Kafka topic. Each minute the forecasting is done for the next 30 minutes based on incoming real-time data.
+The `forecasting_consumer.ipynb` notebook covers the real-time aspect of the forecasting. It includes code for consuming input data from a Kafka topic, producing predictions, and pushing the results back to another Kafka topic. Each minute the forecasting is done for the next 30 minutes based on incoming real-time data.
 
 ## IsolationForest_AnomalyDetection.ipynb
 The `IsolationForest_AnomalyDetection.ipynb` notebook showcases the use of the Isolation Forest algorithm for spotting anomalies in Systolic Blood Pressure (SBP) and Diastolic Blood Pressure (DBP) readings. It focuses on identifying irregularities or outliers within the blood pressure data, employing Isolation Forest as a specialized technique designed for this purpose.
