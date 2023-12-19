@@ -8,8 +8,8 @@ The `Forecasting_Consumer.ipynb` notebook covers the real-time aspect of the for
 ## IsolationForest_AnomalyDetection.ipynb
 The `IsolationForest_AnomalyDetection.ipynb` notebook showcases the use of the Isolation Forest algorithm for spotting anomalies in Systolic Blood Pressure (SBP) and Diastolic Blood Pressure (DBP) readings. It focuses on identifying irregularities or outliers within the blood pressure data, employing Isolation Forest as a specialized technique designed for this purpose.
 
-## consumer_IF_AD.ipynb
-The `consumer_IF_AD.ipynb` notebook details a real-time process for detecting anomalies. It involves consuming data from a Kafka topic, using the Isolation Forest algorithm to detect anomalies within physiological signals, and then forwarding the identified anomalies to another Kafka topic. This notebook sets up a continuous analysis of incoming real-time data, swiftly identifying anomalies in the physiological signals for immediate action.
+## IsolationForestRealTime.ipynb
+The `IsolationForestRealTime.ipynb` notebook details a real-time process for detecting anomalies. It involves consuming data from a Kafka topic, using the Isolation Forest algorithm to detect anomalies within physiological signals, and then forwarding the identified anomalies to another Kafka topic. This notebook sets up a continuous analysis of incoming real-time data, swiftly identifying anomalies in the physiological signals for immediate action.
 
 ## SPO2_Monitoring.ipynb
 The `SPO2_Monitoring.ipynb` notebook includes code for continuously consuming SPO2 data from a Kafka topic, storing this data in InfluxDB, and monitoring and logging the lowest observed SPO2 level over time.
