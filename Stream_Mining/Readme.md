@@ -15,6 +15,10 @@ The `consumer_IF_AD.ipynb` notebook details a real-time process for detecting an
 The `SPO2_Monitoring.ipynb` notebook includes code for continuously consuming SPO2 data from a Kafka topic, storing this data in InfluxDB, and monitoring and logging the lowest observed SPO2 level over time.
 
 
+## Dash_Plotly_Forecasting.ipynb
+This `Dash_Plotly_Forecasting.ipynb` notebook creates a Dash web application that visualizes predictions for Systolic Blood Pressure (SBP) and Diastolic Blood Pressure (DBP) received through a Kafka topic. Plotly's Dash is an open-source framework for building data visualization interfaces.
+
+
 
 
 
